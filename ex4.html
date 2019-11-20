@@ -1,0 +1,126 @@
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<style>
+    .box{
+        width: 100px;
+        height: 100px;
+        background-color: black;
+    }
+
+    .boxR{
+        width: 100px;
+        height: 100px;
+        background-color: red;
+    }
+
+    .boxG{
+        width: 50px;
+        height: 50px;
+        background-color: green;
+    }
+
+    .highlight{
+        background-color: #007700;
+        width: 66px;
+    }
+
+    .white-text{
+        background-color: black;
+        color: white;
+    }
+
+    .box-length{
+        width: 150px;
+    }
+
+</style>
+
+<div id="exercise">
+    <!-- 1) Start the Effect with the Button. The Effect should alternate the "highlight" or "shrink" class on each new setInterval tick (attach respective class to the div with id "effect" below) -->
+    <div>
+        <button @click="startEffect">Start Effect</button>
+        <div id="effect" class="box" :class="{highlight: isHighlight}"></div>
+    </div>
+    <!-- 2) Create a couple of CSS classes and attach them via the array syntax -->
+    <div :class="[wt, length150]">I got no class :(</div>
+    <!-- 3) Let the user enter a class (create some example classes) and attach it -->
+    <div>
+        <input type="text" v-model="boxClass">
+        <div></div>
+    </div>
+    <!-- 4) Let the user enter a class and enter true/ false for another class (create some example classes) and attach the classes -->
+    <div>
+        <input type="text"  v-model="boxClass">
+        <input type="text" :value="isHighlight" v-on:keydown.enter="updateIsLight">
+        <div :class="[boxClass, {highlight: isHighlight}]"></div>
+    </div>
+    <!-- 5) Repeat 3) but now with values for styles (instead of class names). Attach the respective styles.  -->
+    <div>
+        <input type="text">
+        <div :class="boxClass" :style="{ borderColor:  isHighlight}"></div>
+    </div>
+    <!-- 6) Create a simple progress bar with setInterval and style bindings. Start it by hitting the below button. -->
+    <div>
+        <button @click="startProgress">Start Progress</button>
+        <div :style="progressbar">{{progression}}%</div>
+    </div>
+
+    <script>
+
+        new Vue({
+                el: '#exercise',
+                data:{
+                    isHighlight: false,
+                    wt: "white-text",
+                    length150: "box-length",
+                    boxClass: "box",
+                    backgroundColor: "red",
+                    progression: 0
+                },
+                methods : {
+                    startEffect : function () {
+                        var vm=this;
+                        setInterval(
+                            function () {
+                                vm.isHighlight = !vm.isHighlight;
+                            }, 500 )
+                    },
+                    updateIsLight: function (event) {
+                        if ( event.target.value == 'true' )
+                            this.isHighlight = true;
+                        else
+                            this.isHighlight = false;
+                    },
+                    startProgress: function () {
+                        var vm=this;
+
+                        setInterval(
+                            function () {
+                                vm.progression++;
+                                if ( vm.progression>100 ){
+                                    vm.progression=0;
+                                }
+                            }, 100 )
+                    }
+                },
+                computed: {
+                    progressbar: function () {
+                        return{
+                            height: "20px",
+                            width: 20+this.progression*5+"px",
+                            backgroundColor: "green",
+                            textAlign: "center",
+                            color: "white",
+                            padding: "3px",
+                            margin: "10px"
+                        }
+                    }
+                },
+                watch: {
+
+                },
+            }
+        )
+
+    </script>
+</div>

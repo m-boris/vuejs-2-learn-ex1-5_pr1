@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Monster Slayer</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <link rel="stylesheet" href="css/foundation.min.css">
+    <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="app">
+    <section class="row">
+        <div class="small-6 columns">
+            <h1 class="text-center">YOU</h1>
+            <div class="healthbar">
+                <div class="healthbar text-center" style="background-color: green; margin: 0; color: white;" :style="playerBarWidth">
+                    {{playerScore}}
+                </div>
+            </div>
+        </div>
+        <div class="small-6 columns">
+            <h1 class="text-center">MONSTER</h1>
+            <div class="healthbar">
+                <div class="healthbar text-center" style="background-color: green; margin: 0; color: white;" :style="monsterBarWidth">
+                    {{monsterScore}}
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="row controls" v-if="!playMode">
+        <div class="small-12 columns">
+            <button id="start-game" @click="startGame">START NEW GAME</button>
+        </div>
+    </section>
+    <section class="row controls" v-if="playMode">
+        <div class="small-12 columns">
+            <button id="attack" @click="attack">ATTACK</button>
+            <button id="special-attack" @click="specialAttack">SPECIAL ATTACK</button>
+            <button id="heal" @click="heal">HEAL</button>
+            <button id="give-up" @click="monstersWin">GIVE UP</button>
+        </div>
+    </section>
+    <section class="row log" v-if="playMode">
+        <div class="small-12 columns">
+            <ul>
+                <template v-for="line in gameField">
+                    <li :style="{ 'background-color': line.color }">
+                        {{line.message}}
+                    </li>
+                </template>
+            </ul>
+        </div>
+    </section>
+</div>
+<script>
+
+    new Vue({
+            el: '#app',
+            data:{
+                playMode: false,
+                playerScore: 100,
+                monsterScore: 100,
+                gameField: []
+            },
+            methods: {
+                startGame: function () {
+                    this.playMode = true;
+                    this.playerScore = 100;
+                    this.monsterScore = 100;
+                    this.gameField = [];
+                },
+                attack: function () {
+                    this.playerAttack(10);
+                    this.monsterAttack(10);
+                },
+                specialAttack: function () {
+                    this.playerAttack(20);
+                    this.monsterAttack(20);
+                },
+                heal: function(){
+                    let power = this.generatePower( 11 );
+                    this.playerScore= this.playerScore + power;
+                    this.gameField.push(
+                        {
+                            message:'Player heal for ' +power,
+                            color: 'green'
+                        }
+                    );
+                    this.monsterAttack(10);
+                },
+                playerAttack: function ( maxPower ){
+                    let power = this.generatePower( maxPower );
+                    this.monsterScore = this.monsterScore-power;
+                    this.gameField.push(
+                        {
+                            message:'Player hits monsters for ' +power,
+                            color: 'blue'
+                        }
+                    )
+                },
+                monsterAttack: function(maxPower){
+                    let power = this.generatePower( maxPower );
+                    this.playerScore = this.playerScore-power;
+                    this.gameField.push(
+                        {
+                            message: 'Monsters hits player for ' +power,
+                            color: 'red'
+                        }
+                    )
+                },
+                generatePower: function( maxPower ){
+                    return Math.round( Math.random()*maxPower+1 );
+                },
+                monstersWin: function () {
+                    this.displayConfirm( "Monsters win, New Game?" )
+                },
+                playerWin: function () {
+                    this.displayConfirm( "Player win, New Game?" )
+                },
+                displayConfirm : function ( msg ) {
+                    var response = confirm( msg );
+                    if ( response ){
+                        this.startGame();
+                    } else {
+                        this.playMode = false;
+                    }
+                }
+
+            },
+            computed:{
+                playerBarWidth: function () {
+                    return { width :  this.playerScore+'%' };
+                },
+                monsterBarWidth: function () {
+                    return {width : this.monsterScore+'%'};
+                }
+            },
+            watch: {
+                playerScore: function () {
+                    if ( this.playerScore<0 ){
+                        this.monstersWin();
+                    }
+                },
+                monsterScore: function () {
+                    if ( this.monsterScore()<0 ){
+                        this.playerWin();
+                    }
+                }
+            }
+        })
+</script>
+        </body>
+</html>
